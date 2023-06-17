@@ -38,8 +38,8 @@ jobs:
         source .env/bin/activate
     - name: Install dependencies
       run: |
-        pip install --upgrade --force-reinstall setuptools
-        pip install stdeb wheel
+        pip uninstall setuptools
+        pip install stdeb wheel setuptools==66.1.1
         python setup.py develop --help
         python setup.py develop --version
     - name: Create 
