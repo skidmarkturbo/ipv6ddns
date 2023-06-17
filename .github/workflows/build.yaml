@@ -32,6 +32,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         sudo apt-get install -y dh-python python3-stdeb
+    - name: Set up Virtual Environment
+      run: |
+        python -m venv .env
+        source .env/bin/activate
+    - name: Install dependencies
+      run: |
         pip install --upgrade setuptools
         pip install stdeb wheel
     - name: Create 
