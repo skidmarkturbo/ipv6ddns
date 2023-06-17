@@ -38,7 +38,7 @@ jobs:
         source .env/bin/activate
     - name: Install dependencies
       run: |
-        pip uninstall setuptools
+        pip uninstall --yes setuptools
         pip install stdeb wheel setuptools==66.1.1
         python setup.py develop --help
         python setup.py develop --version
