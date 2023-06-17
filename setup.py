@@ -40,7 +40,7 @@ setup(
     license = "MIT",
     keywords = "ipv6 cli ddns firewall",
     url = "https://github.com/skidmarkturbo/ipv6ddns",
-    packages=['ipv6ddns', 'tests'],
+    packages=['ipv6ddns'],
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 1 - Planning",
@@ -51,4 +51,11 @@ setup(
     entry_points = {
         'console_scripts': ['ipv6ddns=ipv6ddns.main:main'],
     },
+    install_requires = [
+        
+    ],
+    extras_require = {
+        "test": [],
+        "dev": []
+    }
 )
