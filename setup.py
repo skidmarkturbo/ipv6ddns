@@ -48,4 +48,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Environment :: Console",
     ],
+    entry_points = {
+        'console_scripts': ['ipv6ddns=ipv6ddns.main:main'],
+    },
 )
