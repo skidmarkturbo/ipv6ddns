@@ -23,4 +23,6 @@ SOFTWARE.
 """
 
 def main():
+    """Entry method for the command line interface
+    """
     print("Hello World!")
