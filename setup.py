@@ -60,8 +60,4 @@ setup(
         'console_scripts': ['ipv6ddns=ipv6ddns.main:main'],
     },
     install_requires = [],
-    extras_require = {
-        "test": [],
-        "dev": []
-    }
 )
