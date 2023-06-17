@@ -40,8 +40,8 @@ jobs:
       run: |
         pip install --upgrade --force-reinstall setuptools
         pip install stdeb wheel
-        setup.py develop --help
-        setup.py develop --version
+        python setup.py develop --help
+        python setup.py develop --version
     - name: Create 
       run: |
         python setup.py --command-packages=stdeb.command bdist_deb
