@@ -56,7 +56,7 @@ jobs:
         python-version: '3.11'
     - name: Install build dependencies
       run: |
-        sudo yum install glibc
+        yum install glibc
         ldd --version
     - name: Create 
       run: |
