@@ -38,7 +38,7 @@ jobs:
         source .env/bin/activate
     - name: Install dependencies
       run: |
-        pip install --upgrade setuptools
+        pip install --upgrade --force-reinstall setuptools
         pip install stdeb wheel
     - name: Create 
       run: |
