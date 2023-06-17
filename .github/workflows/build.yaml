@@ -31,7 +31,7 @@ jobs:
     - name: Install debian dependencies
       run: |
         python -m pip install --upgrade pip
-        apt-get install -y dh-python python3-stdeb
+        sudo apt-get install -y dh-python python3-stdeb
         pip install stdeb wheel
     - name: Create 
       run: |
