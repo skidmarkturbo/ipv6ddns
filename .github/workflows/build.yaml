@@ -41,7 +41,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        body_path: "changelog/release-${{ steps.version.outputs.tag }}..d"
+        body_path: "changelog/release-${{ steps.version.outputs.tag }}.md"
         fail_on_unmatched_files: true
         files: |
           LICENSE.txt
