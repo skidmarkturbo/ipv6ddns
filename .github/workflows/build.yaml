@@ -31,15 +31,14 @@ jobs:
     - name: Install debian dependencies
       run: |
         python -m pip install --upgrade pip
-        sudo apt-get install -y dh-python python3-stdeb
+        sudo apt-get install -y dh-python python3-stdeb python3-distutils
     - name: Set up Virtual Environment
       run: |
         python -m venv .env
         source .env/bin/activate
     - name: Install dependencies
       run: |
-        pip uninstall --yes setuptools
-        pip install stdeb wheel setuptools==66.1.1
+        pip install stdeb wheel
         python setup.py develop --help
         python setup.py develop --version
     - name: Create 
