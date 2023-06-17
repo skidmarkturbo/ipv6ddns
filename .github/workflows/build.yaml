@@ -51,5 +51,3 @@ jobs:
           ipv6ddns-*.tar.gz
           deb_dist/python3-ipv6ddns*.deb
           dist/ipv6ddns*.rpm
-
-    
