@@ -36,8 +36,10 @@ jobs:
       run: |
         version=$(python setup.py --version)
         echo "tag=${version}" >> $GITHUB_OUTPUT
+      if: startsWith(github.ref, 'refs/tags/')
     - name: release
       uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         body_path: "changelog/release-${{ steps.version.outputs.tag }}..d"
         fail_on_unmatched_files: true
