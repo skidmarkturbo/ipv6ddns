@@ -1,20 +1,36 @@
-name: pytest
+name: pylint
 
 on:
   push:
-    branches-ignore:
-    - main
   pull_request:
-    branches:
-    - main
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+    - name: Analysing the code with pylint
+      run: |
+        pylint $(git ls-files '*.py')
+
   test:
     name: Test
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -34,5 +50,6 @@ jobs:
         python -m pytest
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
+      if: ${{ github.event_name == 'push' && matrix.python-version == "3.12" }}
       env: 
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
