@@ -1,5 +1,6 @@
 [![codecov](https://codecov.io/gh/skidmarkturbo/ipv6ddns/branch/main/graph/badge.svg?token=BAZLJAS05Q)](https://codecov.io/gh/skidmarkturbo/ipv6ddns)
-![tests](https://github.com/skidmarkturbo/ipv6ddns/actions/workflows/lint-and-test.yml/badge.svg)
+![tests](https://github.com/skidmarkturbo/ipv6ddns/actions/workflows/lint-and-test.yaml/badge.svg)
+![build](https://github.com/skidmarkturbo/ipv6ddns/actions/workflows/build.yaml/badge.svg)
 
 # ipv6ddns: Dynamic DNS CLI for IPV6 DDNS
 
