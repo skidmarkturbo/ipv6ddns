@@ -30,6 +30,11 @@ class PluginType(Enum):
     ip changes.
     """
 
+    IPV6 = "ipv6ddns.plugin.ipv6"
+    """Provider provides IPV6 resolution. The provider is capable of 
+    determining the correct IPV6 address of the target host.
+    """
+
     UNKNOWN = "unknown"
     """Unknown provider. Internal use only.
     """
@@ -40,6 +45,8 @@ class Plugin:
     extend from this class.
     """
 
+    PLUGIN_NAME_NOOP = "noop"
+
     @staticmethod
     def get_name() -> str:
         """Return the name of this provider. This should be unique across
@@ -48,7 +55,7 @@ class Plugin:
         Returns:
             str: unique name of the provider
         """
-        return ""
+        return Plugin.PLUGIN_NAME_NOOP
 
     @staticmethod
     def get_title() -> str:
@@ -145,6 +152,25 @@ class FirewallPlugin(Plugin):
         return PluginType.FIREWALL
 
 
+class IPResolverPlugin(Plugin):
+    """Informal interface for IPV6 Resolver. Should be exposed in
+    'ipv6ddns.plugin.ipv6' entry point.
+    """
+
+    # pylint: disable=locally-disabled, unused-argument
+    def resolve(self):
+        """Get the current IPV6 address of the target host.
+
+        Returns:
+           str: resolved IPV6 address
+        """
+        return ""
+
+    @staticmethod
+    def get_type() -> PluginType:
+        return PluginType.IPV6
+
+
 # pylint: disable=locally-disabled, too-few-public-methods
 class IPluginLookup:
     """Informal interface for plugin lookup logic
@@ -169,6 +195,7 @@ class ImportLibPluginLookup(IPluginLookup):
 
     def lookup(self, ep_name: str):
         eps = entry_points(group=ep_name)
+        print(eps)
         return [ep.load() for ep in eps]
 
 
@@ -179,16 +206,20 @@ class StaticPluginLookup(IPluginLookup):
     """
 
     def __init__(self,
-                 dns_plugins = None, # type: ignore
-                 firewall_plugins = None) -> None:
+                 dns_plugins = None,
+                 firewall_plugins = None,
+                 ipv6_plugins = None) -> None:
         self.dns_plugins = dns_plugins if dns_plugins else []
         self.firewall_plugins = firewall_plugins if firewall_plugins else []
+        self.ipv6_plugins = ipv6_plugins if ipv6_plugins else []
 
     def lookup(self, ep_name: str):
         if ep_name == PluginType.DNS.value:
-            return self.dns_plugins # type: ignore
+            return self.dns_plugins
         if ep_name == PluginType.FIREWALL.value:
-            return self.firewall_plugins # type: ignore
+            return self.firewall_plugins
+        if ep_name == PluginType.IPV6.value:
+            return self.ipv6_plugins
         return []
 
 
@@ -198,22 +229,29 @@ class PluginManager:
     around plugin management.
     """
 
+    PLUGIN_NAME_NOOP = Plugin.PLUGIN_NAME_NOOP
+
     def __init__(self, lookup: IPluginLookup = ImportLibPluginLookup()) -> None:
         self.lookup = lookup
         self.plugins = []
         self.dns_plugins = {}
         self.firewall_plugins = {}
+        self.ipv6_plugins = {}
 
     def discover(self):
         """Discover available plugins and load them
         """
         self.discover_and_load(
             PluginType.DNS,
-            self.dns_plugins # type: ignore
+            self.dns_plugins
         )
         self.discover_and_load(
             PluginType.FIREWALL,
-            self.firewall_plugins  # type: ignore
+            self.firewall_plugins
+        )
+        self.discover_and_load(
+            PluginType.IPV6,
+            self.ipv6_plugins
         )
 
     def discover_and_load(self, plugin_type: PluginType, target):
@@ -260,3 +298,20 @@ class PluginManager:
             return False
 
         return True
+
+    def get_plugin_names(self, plugin_type):
+        """Get the names of loaded plugins
+
+        Args:
+            plugin_type (PluginType): type of plugins required
+
+        Returns:
+            list: List of plugin names available
+        """
+        if plugin_type == PluginType.DNS:
+            return self.dns_plugins.keys()
+        if plugin_type == PluginType.FIREWALL:
+            return self.firewall_plugins.keys()
+        if plugin_type == PluginType.IPV6:
+            return self.ipv6_plugins.keys()
+        return []
