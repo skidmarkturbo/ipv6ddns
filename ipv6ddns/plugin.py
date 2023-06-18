@@ -5,7 +5,6 @@ from enum import Enum
 import sys
 import logging
 
-from ipv6ddns.domain import ZoneRecord, FirewallEntry
 
 if sys.version_info < (3, 10):
     # pylint: disable=locally-disabled, unused-import
