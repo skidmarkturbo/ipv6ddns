@@ -51,6 +51,25 @@ class Plugin:
         return ""
 
     @staticmethod
+    def get_title() -> str:
+        """Return the descriptive name of this provider. Used in help section
+        and to inform user when things go wrong.
+
+        Returns:
+            str: unique name of the provider
+        """
+        return ""
+
+    @staticmethod
+    def get_description() -> str:
+        """Return the long description for this provider. Used in help section.
+
+        Returns:
+            str: unique name of the provider
+        """
+        return ""
+
+    @staticmethod
     def get_type() -> PluginType:
         """Type of this provider
 
@@ -58,6 +77,15 @@ class Plugin:
             _ProviderType: provider type
         """
         return PluginType.UNKNOWN
+
+    @staticmethod
+    def add_args(argparse_group):
+        """Add arguments specific to this plugin to the passed argparse group.
+        The `argparse_group` is created using `ArgumentParser.add_argument_group()`.
+
+        Args:
+            argparse_group: argparse group
+        """
 
 
 class DNSPlugin(Plugin):
