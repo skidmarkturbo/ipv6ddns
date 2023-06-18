@@ -32,7 +32,7 @@ setup(
     license = "MIT",
     keywords = "ipv6ddns dns route53",
     url = "https://github.com/skidmarkturbo/ipv6ddns",
-    packages=['ipv6ddns_dns_route53.route53'],
+    packages=['ipv6ddns_dns_route53'],
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 1 - Planning",
