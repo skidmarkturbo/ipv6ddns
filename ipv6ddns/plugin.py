@@ -3,7 +3,6 @@ Plugin structure for the ipv6ddns core.
 """
 from enum import Enum
 import sys
-from typing import Optional
 import logging
 
 from ipv6ddns.domain import ZoneRecord, FirewallEntry
@@ -68,7 +67,7 @@ class DNSPlugin(Plugin):
     """
 
     # pylint: disable=locally-disabled, unused-argument
-    def get_aaaa_records(self, fqdns: list[str]) -> list[ZoneRecord]:
+    def get_aaaa_records(self, fqdns):
         """Get AAAA records from DNS server for given list of fully-qualified-domain-names.
         In case the record does not exist, the list return should not contain the record.
 
@@ -81,7 +80,7 @@ class DNSPlugin(Plugin):
         return []
 
     # pylint: disable=locally-disabled, unused-argument
-    def upsert_records(self, records: list[ZoneRecord]) -> None:
+    def upsert_records(self, records) -> None:
         """Create or update the AAAA records in the DNS server.
 
         Args:
@@ -99,7 +98,7 @@ class FirewallPlugin(Plugin):
     """
 
     # pylint: disable=locally-disabled, unused-argument
-    def get_entries(self) -> list[FirewallEntry]:
+    def get_entries(self):
         """Get list of firewall entries in the firewall.
 
         Returns:
@@ -107,7 +106,7 @@ class FirewallPlugin(Plugin):
         """
         return []
 
-    def save_entries(self, entries: list[FirewallEntry]) -> None:
+    def save_entries(self, entries) -> None:
         """Update the entries in firewall
 
         Args:
@@ -125,7 +124,7 @@ class IPluginLookup:
     """
 
     # pylint: disable=locally-disabled, unused-argument
-    def lookup(self, ep_name: str) -> list[Plugin]:
+    def lookup(self, ep_name: str):
         """Lookup plugins, load them and return the list of loaded plugin
         
         Args:
@@ -141,7 +140,7 @@ class ImportLibPluginLookup(IPluginLookup):
     """Plugin lookup using importlib entry points
     """
 
-    def lookup(self, ep_name: str) -> list[Plugin]:
+    def lookup(self, ep_name: str):
         eps = entry_points(group=ep_name)
         return [ep.load() for ep in eps]
 
@@ -153,12 +152,12 @@ class StaticPluginLookup(IPluginLookup):
     """
 
     def __init__(self,
-                 dns_plugins: Optional[list[DNSPlugin]] = None, # type: ignore
-                 firewall_plugins: Optional[list[FirewallPlugin]] = None) -> None:
+                 dns_plugins = None, # type: ignore
+                 firewall_plugins = None) -> None:
         self.dns_plugins = dns_plugins if dns_plugins else []
         self.firewall_plugins = firewall_plugins if firewall_plugins else []
 
-    def lookup(self, ep_name: str) -> list[Plugin]:
+    def lookup(self, ep_name: str):
         if ep_name == PluginType.DNS.value:
             return self.dns_plugins # type: ignore
         if ep_name == PluginType.FIREWALL.value:
@@ -174,9 +173,9 @@ class PluginManager:
 
     def __init__(self, lookup: IPluginLookup = ImportLibPluginLookup()) -> None:
         self.lookup = lookup
-        self.plugins: list[Plugin] = []
-        self.dns_plugins: dict[str, DNSPlugin] = {}
-        self.firewall_plugins: dict[str, FirewallPlugin] = {}
+        self.plugins = []
+        self.dns_plugins = {}
+        self.firewall_plugins = {}
 
     def discover(self):
         """Discover available plugins and load them
@@ -190,7 +189,7 @@ class PluginManager:
             self.firewall_plugins  # type: ignore
         )
 
-    def discover_and_load(self, plugin_type: PluginType, target: dict[str, Plugin]):
+    def discover_and_load(self, plugin_type: PluginType, target):
         """Discover and load plugins from given entry point name and store
         it in the given target dictionalry
 
@@ -207,7 +206,7 @@ class PluginManager:
             target[plugin.get_name()] = plugin
             self.plugins.append(plugin)
 
-    def validate(self, plugin: Plugin, plugin_type: PluginType, target: dict[str, Plugin]) -> bool:
+    def validate(self, plugin: Plugin, plugin_type: PluginType, target) -> bool:
         """Validate the plugin. Check if plugin name is correct and does not
         collide with existing or already loaded plugins.
 
