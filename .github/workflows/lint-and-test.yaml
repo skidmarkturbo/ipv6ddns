@@ -53,7 +53,6 @@ jobs:
     - name: Install project
       run: |
         python setup.py install
-        python ipv6ddns_dns_route53/setup.py install
     - name: Test
       run: |
         python -m pytest

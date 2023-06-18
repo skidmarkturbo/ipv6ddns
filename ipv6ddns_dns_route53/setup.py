@@ -41,7 +41,7 @@ setup(
         "Environment :: Console",
     ],
     entry_points = {
-        'ipv6ddns.plugin.dns': ['route53=ipv6ddns_dns_route53.route53:Route53DNSPlugin'],
+        # 'ipv6ddns.plugin.dns': ['route53=ipv6ddns_dns_route53.route53:Route53DNSPlugin'],
     },
     install_requires = [],
 )

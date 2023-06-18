@@ -42,6 +42,9 @@ setup(
     ],
     entry_points = {
         'console_scripts': ['ipv6ddns=ipv6ddns.main:main'],
+        'ipv6ddns.plugin.dns': ['noop=ipv6ddns.plugin:DNSPlugin'],
+        'ipv6ddns.plugin.firewall': ['noop=ipv6ddns.plugin:FirewallPlugin'],
+        'ipv6ddns.plugin.ipv6': ['noop=ipv6ddns.plugin:IPResolverPlugin'],
     },
     install_requires = [],
 )
