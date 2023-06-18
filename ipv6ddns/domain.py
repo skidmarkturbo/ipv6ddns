@@ -72,6 +72,7 @@ class CommonContext:
     def __init__(self) -> None:
         self.assume_yes = False
         self.dry_run = False
+        self.args = None
 
 
 # pylint: disable=locally-disabled, too-few-public-methods,
@@ -80,7 +81,7 @@ class DNSContext:
     """
 
     def __init__(self) -> None:
-        self.dns = None
+        self.plugin = None
         self.fqdns = []
 
 
@@ -90,7 +91,7 @@ class FirewallContext:
     """
 
     def __init__(self) -> None:
-        self.firewall = None
+        self.plugin = None
         self.tcp_ports = []
         self.udp_ports = []
         self.host_id = None
@@ -102,7 +103,7 @@ class ResolverContext:
     """
 
     def __init__(self) -> None:
-        self.ipv6 = None
+        self.plugin = None
 
 
 # pylint: disable=locally-disabled, too-few-public-methods
