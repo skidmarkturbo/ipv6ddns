@@ -22,6 +22,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname), encoding="utf-8").read()
 
 
+# pylint: disable=locally-disabled, duplicate-code
 setup(
     name = "ipv6ddns",
     version = "0.0.1",
