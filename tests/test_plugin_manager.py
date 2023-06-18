@@ -16,7 +16,6 @@ def test_inbuilt_plugins_are_loaded_correctly():
     """test in-built plugins are loaded correctly"""
     plugin_manager = PluginManager()
     plugin_manager.discover()
-    print(plugin_manager.plugins)
     assert len(plugin_manager.plugins) == 3
     assert plugin_manager.firewall_plugins == {
         PluginManager.PLUGIN_NAME_NOOP: FirewallPlugin
