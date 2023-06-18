@@ -122,6 +122,16 @@ class DNSPlugin(Plugin):
         """
 
     @staticmethod
+    def get_title() -> str:
+        return "NOOP DNS Plugin"
+
+    @staticmethod
+    def get_description() -> str:
+        return "DNS plugin for ipv6ddns which does nothing. Call to get_aaaa_records"\
+            " will always return empty list, and call to upsert_records() will do "\
+            " nothing"
+
+    @staticmethod
     def get_type() -> PluginType:
         return PluginType.DNS
 
@@ -148,6 +158,16 @@ class FirewallPlugin(Plugin):
         """
 
     @staticmethod
+    def get_title() -> str:
+        return "NOOP Firewall Plugin"
+
+    @staticmethod
+    def get_description() -> str:
+        return "Firewall plugin for ipv6ddns which does nothing. Call to get_entries"\
+            " will always return empty list, and call to save_entries() will do "\
+            " nothing"
+
+    @staticmethod
     def get_type() -> PluginType:
         return PluginType.FIREWALL
 
@@ -165,6 +185,15 @@ class IPResolverPlugin(Plugin):
            str: resolved IPV6 address
         """
         return ""
+
+    @staticmethod
+    def get_title() -> str:
+        return "NOOP DNS Plugin"
+
+    @staticmethod
+    def get_description() -> str:
+        return "IPV6 resolver plugin for ipv6ddns which does nothing. Call to"\
+            " resolve will always return empty string."
 
     @staticmethod
     def get_type() -> PluginType:
@@ -195,7 +224,6 @@ class ImportLibPluginLookup(IPluginLookup):
 
     def lookup(self, ep_name: str):
         eps = entry_points(group=ep_name)
-        print(eps)
         return [ep.load() for ep in eps]
 
 
