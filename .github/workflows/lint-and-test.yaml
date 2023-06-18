@@ -45,6 +45,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest pytest-cov
+    - name: Install project
+      run: |
+        python setup.py install
+        python ipv6ddns-dns-route53/setup.py install
     - name: Test
       run: |
         python -m pytest
