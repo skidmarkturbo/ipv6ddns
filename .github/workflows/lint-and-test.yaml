@@ -30,12 +30,11 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        matrix:
-          python-major-version: [3]
-          python-minor-version: [8, 9, 10, 11]
+        python-major-version: [3]
+        python-minor-version: [8, 9, 10, 11]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ format('{0}.{1}', matrix.python-major-version, matrix.python-minor-version) }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ format('{0}.{1}', matrix.python-major-version, matrix.python-minor-version) }}
