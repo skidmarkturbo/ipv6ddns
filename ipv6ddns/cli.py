@@ -20,6 +20,14 @@ class Cli:
             arg_list (list, optional): List of command line arguments. Defaults to None.
         """
 
+    def execute_ctx(self, ctx):
+        """Executes a given context instance. One context instance corresponds
+        to all operations needed for DDNS of single host machine
+
+        Args:
+            ctx (_type_): the context to execute
+        """
+
     def _parse_args(self):
         """Parse cli arguments
         """
@@ -33,7 +41,7 @@ class Cli:
             add_help=False
         )
 
-        # 
+        #
         # Common Options
         #
         parser.add_argument(

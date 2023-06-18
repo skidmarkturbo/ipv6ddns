@@ -79,7 +79,9 @@ class UnknownPlugin(Plugin):
 
 def test_plugin_with_name_is_loaded():
     """Tests that plugin with a valid name is loaded"""
-    plugin_lookup = StaticPluginLookup([PluginWithName], [FirewallPluginWithName], [IPResolverPluginWithName])
+    plugin_lookup = StaticPluginLookup(
+        [PluginWithName], [FirewallPluginWithName], [IPResolverPluginWithName]
+    )
     plugin_manager = PluginManager(plugin_lookup)
     plugin_manager.discover()
     assert len(plugin_manager.plugins) == 3
@@ -89,9 +91,7 @@ def test_plugin_with_name_is_loaded():
     assert plugin_manager.dns_plugins == {
         "awesome": PluginWithName,
     }
-    assert plugin_manager.ipv6_plugins == {
-        'awesome': IPResolverPluginWithName
-    }
+    assert plugin_manager.ipv6_plugins == {"awesome": IPResolverPluginWithName}
 
 
 def test_plugin_with_no_name_is_not_loaded():
