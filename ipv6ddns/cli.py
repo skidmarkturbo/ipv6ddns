@@ -1,7 +1,10 @@
 """Command line interface for ipv6ddns
 """
 import argparse
+import logging
 import sys
+from ipv6ddns.context import ArgparseContextParser
+from ipv6ddns.domain import ValidationError
 from ipv6ddns.plugin import PluginManager, PluginType
 
 
@@ -22,14 +25,50 @@ class Cli:
             arg_list (list, optional): List of command line arguments. Defaults to None.
         """
         contexts = self.get_contexts()
-        print(contexts)
+        has_errors = False
+        for ctx in contexts:
+            errors = self.validate_ctx(ctx)
+            if errors:
+                has_errors = True
+                self._print_errors(errors)
+                logging.debug(str(ctx))
+        if has_errors:
+            sys.exit(3)
+        sys.exit(0)
 
     def get_contexts(self):
         """Parse the cli_args and return the DDNS execution contexts. More
         than one context may be returned in future.
         """
         args = self._parse_args()
-        return args
+        ctx_parser = ArgparseContextParser(self.plugin_manager, args)
+        return ctx_parser.parse()
+
+    def validate_ctx(self, ctx):
+        """Validate the execution context and return the list of ValidationError
+
+        Args:
+            ctx (DDNSContext): ddns execution context
+
+        Returns:
+            list[ValidationError]: list of validation errors. return empty if context is valid
+        """
+        errors = []
+        if ctx.common.force and ctx.common.dry_run:
+            errors.append(ValidationError("main", "Cannot use --dry-run and --force together."))
+        errors = errors + ctx.dns.plugin.validate(ctx)
+        errors = errors + ctx.firewall.plugin.validate(ctx)
+        errors = errors + ctx.ipv6.plugin.validate(ctx)
+        return errors
+
+    def _print_errors(self, errors):
+        """Print the errors.
+
+        Args:
+            errors (list[ValidationError]): list of validation errors
+        """
+        for error in errors:
+            logging.error("[%s] %s", error.plugin_name, error.message)
 
     def _parse_args(self):
         """Parse cli arguments
@@ -82,6 +121,14 @@ class Cli:
             action='store_true',
             required=False,
             help="Run in non-interactive mode. Don't ask for human input or confirmations."
+        )
+
+        parser.add_argument(
+            "-f",
+            "--force",
+            action='store_true',
+            required=False,
+            help="Force update even if nothing has changed."
         )
 
         parser.add_argument(

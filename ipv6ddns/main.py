@@ -3,10 +3,10 @@ Main entry point for the CLI
 """
 from ipv6ddns.cli import Cli
 
-def main():
+def main(args=None):
     """Entry method for the command line interface
     """
-    cli = Cli()
+    cli = Cli(cli_args=args)
     cli.execute()
 
 

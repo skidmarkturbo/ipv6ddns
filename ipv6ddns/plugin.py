@@ -85,6 +85,7 @@ class Plugin:
         """
         return PluginType.UNKNOWN
 
+    # pylint: disable=locally-disabled, unused-argument
     @staticmethod
     def add_args(argparse_group):
         """Add arguments specific to this plugin to the passed argparse group.
@@ -93,6 +94,13 @@ class Plugin:
         Args:
             argparse_group: argparse group
         """
+
+    # pylint: disable=locally-disabled, unused-argument
+    @staticmethod
+    def validate(context):
+        """Validates the context and returns a list of ValidationError
+        """
+        return []
 
 
 class DNSPlugin(Plugin):
