@@ -79,7 +79,7 @@ def test_resolver_ctx_is_parsed_correctly():
     assert ctx.plugin == plugin.IPResolverPlugin
 
 
-class TestDNSPlugin(plugin.DNSPlugin):
+class SampleDNSPlugin(plugin.DNSPlugin):
     """DNS plugin to test custom args
     """
 
@@ -93,9 +93,9 @@ def test_custom_args_are_parsed_correctly():
     """
     plugin_manager = plugin.PluginManager()
     plugin_manager.discover()
-    plugin_manager.register(TestDNSPlugin)
+    plugin_manager.register(SampleDNSPlugin)
     namespace = argparse.Namespace()
-    namespace.dns = TestDNSPlugin.get_name()
+    namespace.dns = SampleDNSPlugin.get_name()
     namespace.domain = ["example.com"]
     namespace.dns_arg = "value"
     namespace.dns_disable = True
@@ -103,7 +103,7 @@ def test_custom_args_are_parsed_correctly():
     parser = ArgparseContextParser(plugin_manager, namespace)
     ctx = parser.parse_dns_ctx()
 
-    assert ctx.plugin == TestDNSPlugin
+    assert ctx.plugin == SampleDNSPlugin
     assert ctx.fqdns == namespace.domain
     assert getattr(ctx, "arg") == namespace.dns_arg
     assert getattr(ctx, "disable")

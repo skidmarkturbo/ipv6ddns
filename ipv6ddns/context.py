@@ -1,6 +1,7 @@
 """
 Classes for execution context
 """
+import socket
 from ipv6ddns.plugin import PluginManager, PluginType
 
 
@@ -156,7 +157,7 @@ class ArgparseContextParser(ContextParser):
         ctx.plugin = self.plugin_manager.firewall_plugins[args.firewall]
         ctx.tcp_ports = args.tcp_port
         ctx.udp_ports = args.udp_port
-        ctx.host_id = args.host_id
+        ctx.host_id = self._get_host_id() # type: ignore
         self.parse_plugin_args(ctx)
         return ctx
 
@@ -179,6 +180,11 @@ class ArgparseContextParser(ContextParser):
         for arg in vars(self.args):
             if arg.startswith(arg_prefix):
                 setattr(ctx, arg[prefix_len:], getattr(self.args, arg))
+
+    def _get_host_id(self):
+        if self.args.host_id:
+            return self.args.host_id
+        return socket.gethostname()
 
     @staticmethod
     def get_arg_prefix(plugin):
