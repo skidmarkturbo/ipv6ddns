@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/skidmarkturbo/ipv6ddns/branch/main/graph/badge.svg?token=BAZLJAS05Q)](https://codecov.io/gh/skidmarkturbo/ipv6ddns)
+[![Coverage Status](https://coveralls.io/repos/github/skidmarkturbo/ipv6ddns/badge.svg?branch=main)](https://coveralls.io/github/skidmarkturbo/ipv6ddns?branch=main)
 ![tests](https://github.com/skidmarkturbo/ipv6ddns/actions/workflows/lint-and-test.yaml/badge.svg)
 ![build](https://github.com/skidmarkturbo/ipv6ddns/actions/workflows/build.yaml/badge.svg)
 
