@@ -40,7 +40,7 @@ class Cli:
         """Parse the cli_args and return the DDNS execution contexts. More
         than one context may be returned in future.
         """
-        args = self._parse_args()
+        args = self.parse_args()
         ctx_parser = ArgparseContextParser(self.plugin_manager, args)
         return ctx_parser.parse()
 
@@ -61,16 +61,7 @@ class Cli:
         errors = errors + ctx.ipv6.plugin.validate(ctx)
         return errors
 
-    def _print_errors(self, errors):
-        """Print the errors.
-
-        Args:
-            errors (list[ValidationError]): list of validation errors
-        """
-        for error in errors:
-            logging.error("[%s] %s", error.plugin_name, error.message)
-
-    def _parse_args(self):
+    def parse_args(self):
         """Parse cli arguments
         """
         parser = self._get_root_parser()
@@ -90,6 +81,15 @@ class Cli:
         args = parser.parse_args(self.cli_args)
 
         return args
+
+    def _print_errors(self, errors):
+        """Print the errors.
+
+        Args:
+            errors (list[ValidationError]): list of validation errors
+        """
+        for error in errors:
+            logging.error("[%s] %s", error.plugin_name, error.message)
 
     def _add_group(self, parser, plugin):
         group = parser.add_argument_group(plugin.get_title(), plugin.get_description())
@@ -157,6 +157,7 @@ class Cli:
             "-d",
             "--domain",
             action='append',
+            default=[],
             type=str,
             required=False,
             help="Domain names to update. Use multiple times to add multiple domains."\
@@ -180,6 +181,7 @@ class Cli:
             "-t",
             "--tcp-port",
             action='append',
+            default=[],
             type=int,
             required=False,
             help="TCP ports to open on firewall. Use multiple times to add multiple ports."\
@@ -191,6 +193,7 @@ class Cli:
             "-u",
             "--udp-port",
             action='append',
+            default=[],
             type=int,
             required=False,
             help="UDP ports to open on firewall. Use multiple times to add multiple ports."\
