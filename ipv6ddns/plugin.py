@@ -42,7 +42,8 @@ class PluginType(Enum):
 
 class Plugin:
     """Informal interface for all providers. All providers by a plugin will 
-    extend from this class.
+    extend from this class. All plugin classes should not expect any arguments
+    in their __init__ method.
     """
 
     PLUGIN_NAME_NOOP = "noop"
@@ -87,9 +88,11 @@ class Plugin:
 
     # pylint: disable=locally-disabled, unused-argument
     @staticmethod
-    def add_args(argparse_group):
+    def add_args(argparse_group, prefix):
         """Add arguments specific to this plugin to the passed argparse group.
         The `argparse_group` is created using `ArgumentParser.add_argument_group()`.
+        All arguments must specify a long arg format and should be prefixed with
+        the given `prefix`.
 
         Args:
             argparse_group: argparse group
@@ -277,20 +280,11 @@ class PluginManager:
     def discover(self):
         """Discover available plugins and load them
         """
-        self.discover_and_load(
-            PluginType.DNS,
-            self.dns_plugins
-        )
-        self.discover_and_load(
-            PluginType.FIREWALL,
-            self.firewall_plugins
-        )
-        self.discover_and_load(
-            PluginType.IPV6,
-            self.ipv6_plugins
-        )
+        self.discover_and_load(PluginType.DNS)
+        self.discover_and_load(PluginType.FIREWALL)
+        self.discover_and_load(PluginType.IPV6)
 
-    def discover_and_load(self, plugin_type: PluginType, target):
+    def discover_and_load(self, plugin_type: PluginType):
         """Discover and load plugins from given entry point name and store
         it in the given target dictionalry
 
@@ -300,14 +294,33 @@ class PluginManager:
         """
         plugins = self.lookup.lookup(plugin_type.value)
         for plugin in plugins:
-            if not self.validate(plugin, plugin_type, target):
-                logging.debug("Skipping invalid plugin '%s'.", plugin)
-                continue
+            self.register(plugin)
 
-            target[plugin.get_name()] = plugin
-            self.plugins.append(plugin)
+    def register(self, plugin):
+        """Manually register a plugin.
 
-    def validate(self, plugin: Plugin, plugin_type: PluginType, target) -> bool:
+        Args:
+            plugin (Plugin): plugin to register.
+        """
+        target = {}
+        if plugin.get_type() == PluginType.DNS:
+            target = self.dns_plugins
+        elif plugin.get_type() == PluginType.FIREWALL:
+            target = self.firewall_plugins
+        elif plugin.get_type() == PluginType.IPV6:
+            target = self.ipv6_plugins
+        else:
+            logging.error("Skipping unknown plugin '%s", plugin)
+            return
+
+        if not self.validate(plugin, target):
+            logging.error("Skipping invalid plugin '%s'.", plugin)
+            return
+
+        target[plugin.get_name()] = plugin
+        self.plugins.append(plugin)
+
+    def validate(self, plugin: Plugin, target) -> bool:
         """Validate the plugin. Check if plugin name is correct and does not
         collide with existing or already loaded plugins.
 
@@ -323,10 +336,6 @@ class PluginManager:
         name = plugin.get_name()
         if not name:
             logging.debug("Invalid plugin name: '%s'", name)
-            return False
-
-        if plugin.get_type() != plugin_type:
-            logging.debug("Plugin type did not match for plugin '%s'", name)
             return False
 
         if name in target:

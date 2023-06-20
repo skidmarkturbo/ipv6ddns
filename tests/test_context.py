@@ -11,6 +11,7 @@ def test_common_ctx_is_parsed_correctly():
     correctly
     """
     plugin_manager = plugin.PluginManager()
+    plugin_manager.discover()
     namespace = argparse.Namespace()
     namespace.dry_run = True
     namespace.force = True
@@ -30,6 +31,7 @@ def test_dns_ctx_is_parsed_correctly():
     correctly
     """
     plugin_manager = plugin.PluginManager()
+    plugin_manager.discover()
     namespace = argparse.Namespace()
     namespace.dns = plugin.PluginManager.PLUGIN_NAME_NOOP
     namespace.domain = ["example.com"]
@@ -46,6 +48,7 @@ def test_firewall_ctx_is_parsed_correctly():
     correctly
     """
     plugin_manager = plugin.PluginManager()
+    plugin_manager.discover()
     namespace = argparse.Namespace()
     namespace.firewall = plugin.PluginManager.PLUGIN_NAME_NOOP
     namespace.tcp_port = [80, 443]
@@ -66,6 +69,7 @@ def test_resolver_ctx_is_parsed_correctly():
     correctly
     """
     plugin_manager = plugin.PluginManager()
+    plugin_manager.discover()
     namespace = argparse.Namespace()
     namespace.resolver = plugin.PluginManager.PLUGIN_NAME_NOOP
 
@@ -73,3 +77,33 @@ def test_resolver_ctx_is_parsed_correctly():
     ctx = parser.parse_resolver_ctx()
 
     assert ctx.plugin == plugin.IPResolverPlugin
+
+
+class TestDNSPlugin(plugin.DNSPlugin):
+    """DNS plugin to test custom args
+    """
+
+    @staticmethod
+    def get_name() -> str:
+        return "test-dns"
+
+def test_custom_args_are_parsed_correctly():
+    """Tests that common context is parsed
+    correctly
+    """
+    plugin_manager = plugin.PluginManager()
+    plugin_manager.discover()
+    plugin_manager.register(TestDNSPlugin)
+    namespace = argparse.Namespace()
+    namespace.dns = TestDNSPlugin.get_name()
+    namespace.domain = ["example.com"]
+    namespace.dns_arg = "value"
+    namespace.dns_disable = True
+
+    parser = ArgparseContextParser(plugin_manager, namespace)
+    ctx = parser.parse_dns_ctx()
+
+    assert ctx.plugin == TestDNSPlugin
+    assert ctx.fqdns == namespace.domain
+    assert getattr(ctx, "arg") == namespace.dns_arg
+    assert getattr(ctx, "disable")

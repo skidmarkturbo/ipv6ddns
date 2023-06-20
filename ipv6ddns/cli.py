@@ -93,7 +93,8 @@ class Cli:
 
     def _add_group(self, parser, plugin):
         group = parser.add_argument_group(plugin.get_title(), plugin.get_description())
-        plugin.add_args(group)
+        prefix = ArgparseContextParser.get_arg_prefix(plugin)
+        plugin.add_args(group, prefix)
 
     def _get_root_parser(self):
         """build the root parser and return it
