@@ -61,7 +61,6 @@ def test_cli_returns_non_zero_code(monkeypatch):
     assert sys_exit.type == SystemExit
     assert sys_exit.value.code == 4
 
-
 def test_dry_run_and_force_together():
     """Test that using --dry-run and --force together
     raises error
