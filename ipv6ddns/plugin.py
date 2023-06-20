@@ -42,11 +42,15 @@ class PluginType(Enum):
 
 class Plugin:
     """Informal interface for all providers. All providers by a plugin will 
-    extend from this class. All plugin classes should not expect any arguments
-    in their __init__ method.
+    extend from this class. All plugin classes should implement an __init__
+    method that takes the CommonContext and Plugin specific context as parameters.
     """
 
     PLUGIN_NAME_NOOP = "noop"
+
+    def __init__(self, common_ctx, plugin_ctx) -> None:
+        self.ctx_common = common_ctx
+        self.ctx_plugin = plugin_ctx
 
     @staticmethod
     def get_name() -> str:
@@ -112,12 +116,12 @@ class DNSPlugin(Plugin):
     """
 
     # pylint: disable=locally-disabled, unused-argument
-    def get_aaaa_records(self, fqdns):
-        """Get AAAA records from DNS server for given list of fully-qualified-domain-names.
-        In case the record does not exist, the list return should not contain the record.
-
-        Args:
-            fqdns (list[str]): list of fqdns for which the records are desired
+    def get_aaaa_records(self):
+        """Get existing AAAA records from DNS server for given list of 
+        fully-qualified-domain-names. The desired FQDNs can be retrieved from 
+        the `fqdns` attribute of the `plugin_ctx` passed to the `__init__` 
+        method. In case the record does not exist, the list return should not 
+        contain the record.
 
         Returns:
             list[ZoneRecord]: list of existing records in the dns server
