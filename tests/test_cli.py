@@ -46,7 +46,7 @@ def test_cli_returns_non_zero_code(monkeypatch):
     """Tests when cli exits code 0
     """
     monkeypatch.setattr('builtins.input', lambda _: "n")
-    
+
     args = [
         "--domain", "example.com",
         "--domain", "site.example.com",
