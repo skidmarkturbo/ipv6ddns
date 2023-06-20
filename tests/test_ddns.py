@@ -11,8 +11,7 @@ from ipv6ddns.plugin import PluginManager
 
 @pytest.fixture()
 def plugin_manager():
-    """Plugin manager fixture for this test
-    """
+    """Plugin manager fixture for this test"""
     plugins = PluginManager()
     plugins.discover()
     yield plugins
@@ -21,8 +20,7 @@ def plugin_manager():
 # pylint: disable=locally-disabled, redefined-outer-name
 @pytest.fixture()
 def empty_context(plugin_manager):
-    """Empty DDNS execution context
-    """
+    """Empty DDNS execution context"""
     args = []
     cli = Cli(args)
     parsed = cli.parse_args()
@@ -31,19 +29,24 @@ def empty_context(plugin_manager):
     yield ctx[0]
 
 
-# pylint: disable=locally-disabled, redefined-outer-name
+# pylint: disable=locally-disabled, redefined-outer-name, duplicate-code
 @pytest.fixture()
 def full_context(plugin_manager):
     """DDNS context with 2 domains and 3 firewall ports and asking
     for non-interactive mode using --assume-yes
     """
     args = [
-        "--domain", "example.com",
-        "--domain", "site.example.com",
-        "--tcp-port", "80",
-        "--tcp-port", "443",
-        "--udp-port", "1191",
-        "--assume-yes"
+        "--domain",
+        "example.com",
+        "--domain",
+        "site.example.com",
+        "--tcp-port",
+        "80",
+        "--tcp-port",
+        "443",
+        "--udp-port",
+        "1191",
+        "--assume-yes",
     ]
     cli = Cli(args)
     parsed = cli.parse_args()
@@ -52,18 +55,23 @@ def full_context(plugin_manager):
     yield ctx[0]
 
 
-# pylint: disable=locally-disabled, redefined-outer-name
+# pylint: disable=locally-disabled, redefined-outer-name, duplicate-code
 @pytest.fixture()
 def input_context(plugin_manager):
     """DDNS context with 2 domains and 3 firewall ports and asking
     for user input before applying changes.
     """
     args = [
-        "--domain", "example.com",
-        "--domain", "site.example.com",
-        "--tcp-port", "80",
-        "--tcp-port", "443",
-        "--udp-port", "1191"
+        "--domain",
+        "example.com",
+        "--domain",
+        "site.example.com",
+        "--tcp-port",
+        "80",
+        "--tcp-port",
+        "443",
+        "--udp-port",
+        "1191",
     ]
     cli = Cli(args)
     parsed = cli.parse_args()
@@ -73,15 +81,11 @@ def input_context(plugin_manager):
 
 
 def test_get_fw_diff_no_old_records():
-    """Test get_fw_diff when old entries is empty
-    """
+    """Test get_fw_diff when old entries is empty"""
     old = []
     new = [
         FirewallEntry(
-            "fw:1", 
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            80,
-            Protocol.TCP
+            "fw:1", "0001:db8:3333:4444:5555:6666:7777:8888", 80, Protocol.TCP
         )
     ]
 
@@ -93,22 +97,15 @@ def test_get_fw_diff_no_old_records():
 
 
 def test_get_fw_diff_update_records():
-    """Test get_fw_diff when records need to be updated
-    """
+    """Test get_fw_diff when records need to be updated"""
     old = [
         FirewallEntry(
-            "fw:1", 
-            "0001:db8:3333:4444:5555:6666:7777:8889",
-            80,
-            Protocol.TCP
+            "fw:1", "0001:db8:3333:4444:5555:6666:7777:8889", 80, Protocol.TCP
         )
     ]
     new = [
         FirewallEntry(
-            "fw:1", 
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            80,
-            Protocol.TCP
+            "fw:1", "0001:db8:3333:4444:5555:6666:7777:8888", 80, Protocol.TCP
         )
     ]
 
@@ -120,22 +117,15 @@ def test_get_fw_diff_update_records():
 
 
 def test_get_fw_diff_no_changes():
-    """Test get_fw_diff when no changes are required
-    """
+    """Test get_fw_diff when no changes are required"""
     old = [
         FirewallEntry(
-            "fw:1", 
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            80,
-            Protocol.TCP
+            "fw:1", "0001:db8:3333:4444:5555:6666:7777:8888", 80, Protocol.TCP
         )
     ]
     new = [
         FirewallEntry(
-            "fw:1", 
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            80,
-            Protocol.TCP
+            "fw:1", "0001:db8:3333:4444:5555:6666:7777:8888", 80, Protocol.TCP
         )
     ]
 
@@ -145,16 +135,9 @@ def test_get_fw_diff_no_changes():
 
 
 def test_get_dns_diff_no_old_records():
-    """Test get_dns_diff when old entries is empty
-    """
+    """Test get_dns_diff when old entries is empty"""
     old = []
-    new = [
-        ZoneRecord(
-            "example.com",
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            60
-        )
-    ]
+    new = [ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8888", 60)]
 
     diff = DDNSWorkflow.get_dns_diff(old, new)
 
@@ -164,22 +147,9 @@ def test_get_dns_diff_no_old_records():
 
 
 def test_get_dns_diff_update_records():
-    """Test get_dns_diff when records need to be updated
-    """
-    old = [
-        ZoneRecord(
-            "example.com",
-            "0001:db8:3333:4444:5555:6666:7777:8889",
-            60
-        )
-    ]
-    new = [
-        ZoneRecord(
-            "example.com",
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            60
-        )
-    ]
+    """Test get_dns_diff when records need to be updated"""
+    old = [ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8889", 60)]
+    new = [ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8888", 60)]
 
     diff = DDNSWorkflow.get_dns_diff(old, new)
 
@@ -189,22 +159,9 @@ def test_get_dns_diff_update_records():
 
 
 def test_get_dns_diff_no_update():
-    """Test get_dns_diff when there are no changes
-    """
-    old = [
-        ZoneRecord(
-            "example.com",
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            60
-        )
-    ]
-    new = [
-        ZoneRecord(
-            "example.com",
-            "0001:db8:3333:4444:5555:6666:7777:8888",
-            60
-        )
-    ]
+    """Test get_dns_diff when there are no changes"""
+    old = [ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8888", 60)]
+    new = [ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8888", 60)]
 
     diff = DDNSWorkflow.get_dns_diff(old, new)
 
@@ -212,62 +169,38 @@ def test_get_dns_diff_no_update():
 
 
 def test_print_diff():
-    """Test print_diff
-    """
+    """Test print_diff"""
     dns_diff = [
         (
-            ZoneRecord(
-                "example.com",
-                "0001:db8:3333:4444:5555:6666:7777:8889",
-                60
-            ),
-            ZoneRecord(
-                "example.com",
-                "0001:db8:3333:4444:5555:6666:7777:8888",
-                60
-            )
+            ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8889", 60),
+            ZoneRecord("example.com", "0001:db8:3333:4444:5555:6666:7777:8888", 60),
         ),
         (
             None,
             ZoneRecord(
-                "site.example.com",
-                "0001:db8:3333:4444:5555:6666:7777:8888",
-                60
-            )
-        )
+                "site.example.com", "0001:db8:3333:4444:5555:6666:7777:8888", 60
+            ),
+        ),
     ]
 
     fw_diff = [
         (
             FirewallEntry(
-                "fw:1", 
-                "0001:db8:3333:4444:5555:6666:7777:8889",
-                80,
-                Protocol.TCP
+                "fw:1", "0001:db8:3333:4444:5555:6666:7777:8889", 80, Protocol.TCP
             ),
             FirewallEntry(
-                "fw:1", 
-                "0001:db8:3333:4444:5555:6666:7777:8888",
-                80,
-                Protocol.TCP
-            )
+                "fw:1", "0001:db8:3333:4444:5555:6666:7777:8888", 80, Protocol.TCP
+            ),
         ),
         (
             None,
             FirewallEntry(
-                "fw:1", 
-                "0001:db8:3333:4444:5555:6666:7777:8888",
-                443,
-                Protocol.TCP
-            )
-        )
+                "fw:1", "0001:db8:3333:4444:5555:6666:7777:8888", 443, Protocol.TCP
+            ),
+        ),
     ]
 
-    DDNSWorkflow.print_diff(
-        "0001:db8:3333:4444:5555:6666:7777:8888",
-        dns_diff,
-        fw_diff
-    )
+    DDNSWorkflow.print_diff("0001:db8:3333:4444:5555:6666:7777:8888", dns_diff, fw_diff)
 
 
 # pylint: disable=locally-disabled, redefined-outer-name
@@ -353,12 +286,12 @@ def test_ddns_works_correctly_with_no(input_context, monkeypatch):
     """Test that expected firewall entries are created
     correctly
     """
-    monkeypatch.setattr('builtins.input', lambda _: "n")
+    monkeypatch.setattr("builtins.input", lambda _: "n")
     workflow = DDNSWorkflow(input_context)
     result = workflow.run()
     assert result == 4
 
-    monkeypatch.setattr('builtins.input', lambda _: "no")
+    monkeypatch.setattr("builtins.input", lambda _: "no")
     workflow = DDNSWorkflow(input_context)
     result = workflow.run()
     assert result == 4
@@ -369,12 +302,12 @@ def test_ddns_works_correctly_with_yes(input_context, monkeypatch):
     """Test that expected firewall entries are created
     correctly
     """
-    monkeypatch.setattr('builtins.input', lambda _: "y")
+    monkeypatch.setattr("builtins.input", lambda _: "y")
     workflow = DDNSWorkflow(input_context)
     result = workflow.run()
     assert result == 0
 
-    monkeypatch.setattr('builtins.input', lambda _: "yes")
+    monkeypatch.setattr("builtins.input", lambda _: "yes")
     workflow = DDNSWorkflow(input_context)
     result = workflow.run()
     assert result == 0
