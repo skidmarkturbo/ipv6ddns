@@ -1,7 +1,7 @@
 """
 Classes for execution context
 """
-from ipv6ddns.plugin import PluginManager
+from ipv6ddns.plugin import PluginManager, PluginType
 
 
 # pylint: disable=locally-disabled, too-few-public-methods,
@@ -146,6 +146,7 @@ class ArgparseContextParser(ContextParser):
         ctx = DNSContext()
         ctx.plugin = self.plugin_manager.dns_plugins[args.dns]
         ctx.fqdns = args.domain
+        self.parse_plugin_args(ctx)
         return ctx
 
     def parse_firewall_ctx(self):
@@ -156,6 +157,7 @@ class ArgparseContextParser(ContextParser):
         ctx.tcp_ports = args.tcp_port
         ctx.udp_ports = args.udp_port
         ctx.host_id = args.host_id
+        self.parse_plugin_args(ctx)
         return ctx
 
     def parse_resolver_ctx(self):
@@ -163,4 +165,36 @@ class ArgparseContextParser(ContextParser):
         args = self.args
         ctx = ResolverContext()
         ctx.plugin = self.plugin_manager.ipv6_plugins[args.resolver]
+        self.parse_plugin_args(ctx)
         return ctx
+
+    def parse_plugin_args(self, ctx):
+        """Parse plugin specific arguments
+
+        Args:
+            ctx (DNSContext | FirewallContext | ResolverContext): context to parse for
+        """
+        arg_prefix = f"{self.get_arg_prefix(ctx.plugin)}_"
+        prefix_len = len(arg_prefix)
+        for arg in vars(self.args):
+            if arg.startswith(arg_prefix):
+                setattr(ctx, arg[prefix_len:], getattr(self.args, arg))
+
+    @staticmethod
+    def get_arg_prefix(plugin):
+        """Get prefix to use for arguments for a given plugin class
+
+        Args:
+            plugin (Plugin): the plugin for which argparse prefix is desired
+
+        Returns:
+            _type_: _description_
+        """
+        prefix = ""
+        if plugin.get_type() == PluginType.DNS:
+            prefix = "dns"
+        elif plugin.get_type() == PluginType.FIREWALL:
+            prefix = "fw"
+        elif plugin.get_type() == PluginType.IPV6:
+            prefix = "ipv6"
+        return prefix
