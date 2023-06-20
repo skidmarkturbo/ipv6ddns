@@ -18,15 +18,19 @@ class DDNSWorkflow:
     def run(self):
         """Run the workflow
         """
-        curr_ip, curr_dns, curr_fw = self.build_old_view()
-        new_dns, new_fw = self.build_new_view(curr_ip)
+        curr_ip = self.ipv6.resolve()
+        curr_dns = self.dns.get_aaaa_records()
+        curr_fw = self.firewall.get_entries()
 
-        dns_diff, fw_diff = self.print_diff(
-            curr_ip,
-            (curr_dns, new_dns),
-            (curr_fw, new_fw)
-        )
-        if not dns_diff and fw_diff and not self.ctx.common.forced:
+        new_dns = self.get_expected_dns_records(curr_ip)
+        new_fw = self.get_expected_fw_entries(curr_ip)
+
+        dns_diff = self.get_dns_diff(curr_dns, new_dns)
+        fw_diff = self.get_fw_diff(curr_fw, new_fw)
+
+        self.print_diff(curr_ip, dns_diff, fw_diff)
+
+        if not dns_diff and not fw_diff and not self.ctx.common.force:
             logging.info("No updates to make. Exiting!")
             return 0
 
@@ -39,38 +43,29 @@ class DDNSWorkflow:
         self.update(new_dns, new_fw)
         return 0
 
-    def build_old_view(self):
-        """Build the old view of things. What does the world see currently. This
-        fetches the current IPV6 of host, the existing DNS and firewall records. 
+    def get_expected_dns_records(self, curr_ip):
+        """return the list of dns records expected in the zone.
+
+        Args:
+            curr_ip (str): the current ip address
+
+        Returns:
+            list[ZoneRecord]: list of expected zone records
         """
-        logging.debug("Resolving the current IPV6 address of the host.")
-        curr_ip = self.ipv6.resolve()
-        logging.debug("IPV6 of the host is %s", curr_ip)
-
-        logging.debug("Fetching current DNS entries for %d domains", len(self.ctx.dns.fqdns))
-        curr_dns = self.dns.get_aaaa_records()
-        logging.debug("Found %d entries in DNS.", len(curr_dns))
-
-        logging.debug(
-            "Fetching current firewall entries for %d tcp ports, %d udp ports, and host=%s",
-            len(self.ctx.firewall.tcp_ports),
-            len(self.ctx.firewall.udp_ports),
-            self.ctx.firewall.host_id
-        )
-        curr_fw = self.firewall.get_entries()
-        logging.debug("Found %d firewall entries", len(curr_fw))
-
-        return (curr_ip, curr_dns, curr_fw)
-
-    def build_new_view(self, curr_ip):
-        """Build the correct view of DNS entries and firewalls according to the new
-        IPV6 address.
-        """
-        new_dns = [
+        return [
             ZoneRecord(domain, curr_ip, 60)
             for domain in self.ctx.dns.fqdns
         ]
 
+    def get_expected_fw_entries(self, curr_ip):
+        """return the list of firewall entries expected in the firewall
+
+        Args:
+            curr_ip (str): current ip address
+
+        Returns:
+            list[FirewallEntry]: list of firewall entries
+        """
         tcp_fw_entries = [
             FirewallEntry("", curr_ip, port, Protocol.TCP)
             for port in self.ctx.firewall.tcp_ports
@@ -81,18 +76,16 @@ class DDNSWorkflow:
             for port in self.ctx.firewall.udp_ports
         ]
 
-        new_fw = tcp_fw_entries + udp_fw_entries
+        return tcp_fw_entries + udp_fw_entries
 
-        return (new_dns, new_fw)
-
-    def print_diff(self, new_ip, dns_diff, fw_diff):
+    @staticmethod
+    def print_diff(new_ip, dns_diff, fw_diff):
         """Print the diff between old and new view. Only print the 
         differences: new entries to be created or updated in DNS and 
         firewall
         """
         logging.info("Current IP of the host is %s", new_ip)
 
-        dns_diff = self.get_dns_diff(dns_diff[0], dns_diff[1])
         for entry in dns_diff:
             old = entry[0]
             new = entry[1]
@@ -101,7 +94,6 @@ class DDNSWorkflow:
             else:
                 logging.info("[dns.update] %s => %s [old=%s]", new.name, new.ip_addr, old.ip_addr)
 
-        fw_diff = self.get_fw_diff(fw_diff[0], fw_diff[1])
         for entry in fw_diff:
             old = entry[0]
             new = entry[1]
@@ -109,28 +101,28 @@ class DDNSWorkflow:
                 logging.info("[fw.add] ALLOW %s:%s TO %s", new.protocol, new.port, new.ip_addr)
             else:
                 logging.info("[fw.update] ALLOW %s:%s TO %s [old=%s]",
-                             new.name, new.port, new.ip_addr, old.ip_addr)
+                             new.protocol, new.port, new.ip_addr, old.ip_addr)
 
-        return (dns_diff, fw_diff)
-
-    def get_dns_diff(self, old, new):
+    @staticmethod
+    def get_dns_diff(old, new):
         """Compute and return the diff for DNS records. Returns list of
         tuples containing old and new records for same FQDN.
         """
         diff = []
         for record in new:
-            existing = self._find_dns_record(record, old)
+            existing = DDNSWorkflow._find_dns_record(record, old)
             if not existing or existing.ip_addr != record.ip_addr:
                 diff.append((existing, record))
         return diff
 
-    def get_fw_diff(self, old, new):
+    @staticmethod
+    def get_fw_diff(old, new):
         """Compute and return the diff for firewall records. Returns list of
         tuples containing old and new records for same entry_id.
         """
         diff = []
         for record in new:
-            existing = self._find_fw_entry(record, old)
+            existing = DDNSWorkflow._find_fw_entry(record, old)
             if not existing or existing.ip_addr != record.ip_addr:
                 diff.append((existing, record))
         return diff
