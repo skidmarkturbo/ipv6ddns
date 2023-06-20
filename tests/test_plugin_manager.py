@@ -71,10 +71,6 @@ class UnknownPlugin(Plugin):
     This should not be done.
     """
 
-    @staticmethod
-    def get_name():
-        return "hello"
-
 
 def test_plugin_with_name_is_loaded():
     """Tests that plugin with a valid name is loaded"""

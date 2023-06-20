@@ -113,7 +113,6 @@ class ContextParser:
         Returns:
             list[DDNSContext]: list of execution contexts
         """
-        return []
 
 
 class ArgparseContextParser(ContextParser):

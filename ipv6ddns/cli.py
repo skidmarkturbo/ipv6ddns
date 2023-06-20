@@ -4,6 +4,7 @@ import argparse
 import logging
 import sys
 from ipv6ddns.context import ArgparseContextParser
+from ipv6ddns.ddns import DDNSWorkflow
 from ipv6ddns.domain import ValidationError
 from ipv6ddns.plugin import PluginManager, PluginType
 
@@ -34,7 +35,15 @@ class Cli:
                 logging.debug(str(ctx))
         if has_errors:
             sys.exit(3)
-        sys.exit(0)
+
+        ret_val = 0
+        for ctx in contexts:
+            workflow = DDNSWorkflow(ctx)
+            response = workflow.run()
+            if response:
+                ret_val = response
+
+        sys.exit(ret_val)
 
     def get_contexts(self):
         """Parse the cli_args and return the DDNS execution contexts. More
